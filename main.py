@@ -1,76 +1,82 @@
-
 import os
 from telegram import Update, ReplyKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
-# توکن ربات از متغیر محیطی گرفته می‌شود
-TOKEN = os.environ.get("BOT_TOKEN")
+# دریافت توکن از متغیر محیطی (در render تنظیم می‌شود)
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-# دکمه‌های اصلی
-main_menu = [["مشاهده کاتالوگ محصولات"], ["درباره ما", "تماس با ما"]]
+# منوی اصلی
+main_keyboard = ReplyKeyboardMarkup(
+    [["📦 مشاهده کاتالوگ محصولات"], ["ℹ️ درباره ما", "📞 تماس با ما"]],
+    resize_keyboard=True
+)
 
-# دکمه‌های کاتالوگ
-catalog_menu = [["شیرآلات البرز"], ["محصولات پرنیان"], ["محصولات آلتون"], ["بازگشت"]]
+# زیرمنوی کاتالوگ
+catalog_keyboard = ReplyKeyboardMarkup(
+    [["🛁 شیرآلات البرز", "🟣 محصولات پرنیان", "🔴 محصولات آلتون"], ["🔙 بازگشت"]],
+    resize_keyboard=True
+)
 
-# هندلر شروع
+# تابع شروع
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "به ربات شرکت توکل تجارت اسپادانا خوش آمدید 🌐",
-        reply_markup=ReplyKeyboardMarkup(main_menu, resize_keyboard=True)
+        "به ربات شرکت توکل تجارت اسپادانا خوش آمدید 🌐\nلطفاً یکی از گزینه‌های زیر را انتخاب کنید:",
+        reply_markup=main_keyboard
     )
 
-# هندلر پیام‌ها
+# مدیریت پیام‌ها
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
 
-    if text == "مشاهده کاتالوگ محصولات":
-        await update.message.reply_text(
-            "لطفاً یکی از دسته‌بندی‌های زیر را انتخاب کنید:",
-            reply_markup=ReplyKeyboardMarkup(catalog_menu, resize_keyboard=True)
-        )
-    elif text == "شیرآلات البرز":
-        await send_pdf(update, "alborz.pdf")
-    elif text == "محصولات پرنیان":
-        await send_pdf(update, "parnian.pdf")
-    elif text == "محصولات آلتون":
-        await send_pdf(update, "altun.pdf")
-    elif text == "درباره ما":
-        await update.message.reply_text(
-            "شرکت توکل تجارت اسپادانا با سال‌ها تجربه در زمینه عرضه لوازم بهداشتی و ساختمانی مانند هود، سینک، شیرآلات و فر توکار، "
-            "همواره تلاش کرده تا بهترین محصولات را با مناسب‌ترین قیمت به مشتریان خود ارائه دهد."
-        )
-    elif text == "تماس با ما":
-        await update.message.reply_text(
-            "☎37352955
-☎37352956
-☎37352957
-📲09912629410
-📲09912629411
-📲09912629412"
-        )
-    elif text == "بازگشت":
-        await update.message.reply_text(
-            "بازگشت به منوی اصلی:",
-            reply_markup=ReplyKeyboardMarkup(main_menu, resize_keyboard=True)
-        )
-    else:
-        await update.message.reply_text("لطفاً یکی از گزینه‌ها را انتخاب کنید.")
+    if text == "📦 مشاهده کاتالوگ محصولات":
+        await update.message.reply_text("یکی از برندهای زیر را انتخاب کنید:", reply_markup=catalog_keyboard)
 
-# ارسال PDF
-async def send_pdf(update: Update, filename: str):
-    file_path = os.path.join("pdfs", filename)
-    if os.path.exists(file_path):
-        with open(file_path, "rb") as f:
-            await update.message.reply_document(document=f)
-    else:
-        await update.message.reply_text("فایل مورد نظر یافت نشد.")
+    elif text == "🛁 شیرآلات البرز":
+        await send_pdf(update, "pdfs/alborz.pdf", "📄 کاتالوگ شیرآلات البرز")
 
-# اجرای اپلیکیشن
-def main():
-    app = ApplicationBuilder().token(TOKEN).build()
+    elif text == "🟣 محصولات پرنیان":
+        await send_pdf(update, "pdfs/parnian.pdf", "📄 کاتالوگ محصولات پرنیان")
+
+    elif text == "🔴 محصولات آلتون":
+        await send_pdf(update, "pdfs/altun.pdf", "📄 کاتالوگ محصولات آلتون")
+
+    elif text == "🔙 بازگشت":
+        await update.message.reply_text("به منوی اصلی بازگشتید.", reply_markup=main_keyboard)
+
+    elif text == "ℹ️ درباره ما":
+        await update.message.reply_text(
+            """شرکت *توکل تجارت اسپادانا* با هدف ارائه بهترین و باکیفیت‌ترین محصولات بهداشتی و ساختمانی فعالیت خود را آغاز کرده است.
+این مجموعه با بهره‌گیری از برندهای معتبر مانند *آلتون، پرنیان و البرز*، تلاش دارد نیازهای مشتریان در زمینه تجهیزات آشپزخانه، شیرآلات و هود را به بهترین شکل ممکن تأمین کند.
+ما همواره به کیفیت، مشتری‌مداری و خدمات پس از فروش متعهد هستیم.""",
+            parse_mode='Markdown'
+        )
+
+    elif text == "📞 تماس با ما":
+        await update.message.reply_text(
+            "شماره‌های تماس شرکت:\n"
+            "☎ 037-37352955\n"
+            "☎ 037-37352956\n"
+            "☎ 037-37352957\n"
+            "📲 09912629410\n"
+            "📲 09912629411\n"
+            "📲 09912629412"
+        )
+
+    else:
+        await update.message.reply_text("لطفاً یکی از گزینه‌های منو را انتخاب کنید.")
+
+# تابع ارسال PDF
+async def send_pdf(update: Update, file_path: str, caption: str):
+    try:
+        with open(file_path, 'rb') as f:
+            await update.message.reply_document(document=f, caption=caption)
+    except FileNotFoundError:
+        await update.message.reply_text("❗ فایل مربوط به این برند یافت نشد.")
+
+# اجرای ربات
+if name == "__main__":
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.add_handler(MessageHandler(filters.TEXT, handle_message))
+    print("🤖 ربات در حال اجراست...")
     app.run_polling()
-
-if __name__ == "__main__":
-    main()
