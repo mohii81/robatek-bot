@@ -54,8 +54,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif text == "📞 تماس با ما":
         await update.message.reply_text(
             "شماره‌های تماس شرکت:\n"
-"☎ 37352955\n"
-           "☎ 37352956\n"
+            "☎ 37352955\n"
+            "☎ 37352956\n"
             "☎ 37352957\n"
             "📲 09912629410\n"
             "📲 09912629411\n"
@@ -74,7 +74,7 @@ async def send_pdf(update: Update, file_path: str, caption: str):
         await update.message.reply_text("❗ فایل مربوط به این برند یافت نشد.")
 
 # اجرای ربات
-if name == "__main__":
+if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
