@@ -54,9 +54,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif text == "📞 تماس با ما":
         await update.message.reply_text(
             "شماره‌های تماس شرکت:\n"
-            "☎ 037-37352955\n"
-            "☎ 037-37352956\n"
-            "☎ 037-37352957\n"
+"☎ 37352955\n"
+           "☎ 37352956\n"
+            "☎ 37352957\n"
             "📲 09912629410\n"
             "📲 09912629411\n"
             "📲 09912629412"
