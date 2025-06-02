@@ -2,7 +2,7 @@ import os
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
-# دریافت توکن از متغیر محیطی (در render تنظیم می‌شود)
+# دریافت توکن از متغیر محیطی (در Render تنظیم می‌شود)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # منوی اصلی
@@ -31,14 +31,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "📦 مشاهده کاتالوگ محصولات":
         await update.message.reply_text("یکی از برندهای زیر را انتخاب کنید:", reply_markup=catalog_keyboard)
 
-    elif text == "🛁 شیرآلات البرز":
-        await send_pdf(update, "pdfs/alborz.pdf", "📄 کاتالوگ شیرآلات البرز")
+    elif text == "🟣 شیرآلات البرز":
+        await send_pdf(update, "alborz.pdf", "📄 کاتالوگ شیرآلات البرز")
 
-    elif text == "🟣 محصولات پرنیان":
-        await send_pdf(update, "pdfs/parnian.pdf", "📄 کاتالوگ محصولات پرنیان")
+    elif text ==   "🟢محصولات پرنیان":
+        await send_pdf(update, "parnian.pdf", "📄 کاتالوگ محصولات پرنیان")
 
-    elif text == "🔴 محصولات آلتون":
-        await send_pdf(update, "pdfs/altun.pdf", "📄 کاتالوگ محصولات آلتون")
+    elif text == "🟡 محصولات آلتون":
+        await send_pdf(update, "altun.pdf", "📄 کاتالوگ محصولات آلتون")
 
     elif text == "🔙 بازگشت":
         await update.message.reply_text("به منوی اصلی بازگشتید.", reply_markup=main_keyboard)
@@ -77,6 +77,6 @@ async def send_pdf(update: Update, file_path: str, caption: str):
 if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT, handle_message))
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
     print("🤖 ربات در حال اجراست...")
     app.run_polling()
